@@ -417,7 +417,7 @@ def main():
     optimizer.zero_grad()
     model.cuda()
     model.train()
-    #prototype_dist_init(cfg, trainloader, model)
+    prototype_dist_init(cfg, trainloader, model)
     interp = nn.Upsample(size=(input_size[0], input_size[1]), mode='bilinear', align_corners=True)
     start_iteration = 0
     if args.resume:
