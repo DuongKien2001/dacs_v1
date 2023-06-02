@@ -234,8 +234,8 @@ def _resume_checkpoint(resume_path, model, optimizer, ema_model):
 
 def prototype_dist_init(cfg, trainloader, model):
     feature_num = 2048
-    feat_estimator = prototype_dist_estimator(feature_num=feature_num, cfg=cfg)
-    out_estimator = prototype_dist_estimator(feature_num=cfg.MODEL.NUM_CLASSES, cfg=cfg)
+    feat_estimator = prototype_dist_estimator(feature_num=feature_num, cfg=cfg, res = 0)
+    out_estimator = prototype_dist_estimator(feature_num=cfg.MODEL.NUM_CLASSES, cfg=cfg, res = 0)
 
     torch.cuda.empty_cache()
 
@@ -244,7 +244,7 @@ def prototype_dist_init(cfg, trainloader, model):
     end = time.time()
     start_time = time.time()
     max_iters = len(trainloader)
-    
+    print("init")
     with torch.no_grad():
         for i, (src_input, src_label, _, _) in enumerate(trainloader):
             data_time = time.time() - end
@@ -339,9 +339,6 @@ def main():
     
     
     cudnn.benchmark = True
-    feat_estimator = prototype_dist_estimator(feature_num=feature_num, cfg=cfg)
-    if cfg.SOLVER.MULTI_LEVEL:
-        out_estimator = prototype_dist_estimator(feature_num=cfg.MODEL.NUM_CLASSES, cfg=cfg)
     pcl_criterion_src = PrototypeContrastiveLoss(cfg)
     pcl_criterion_tgt = PrototypeContrastiveLoss(cfg)
     
@@ -418,6 +415,9 @@ def main():
     model.cuda()
     model.train()
     prototype_dist_init(cfg, trainloader, model)
+    feat_estimator = prototype_dist_estimator(feature_num=feature_num, cfg=cfg)
+    if cfg.SOLVER.MULTI_LEVEL:
+        out_estimator = prototype_dist_estimator(feature_num=cfg.MODEL.NUM_CLASSES, cfg=cfg)
     interp = nn.Upsample(size=(input_size[0], input_size[1]), mode='bilinear', align_corners=True)
     start_iteration = 0
     if args.resume:

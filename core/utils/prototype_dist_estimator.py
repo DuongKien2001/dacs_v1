@@ -3,7 +3,7 @@ import torch
 import torch.utils.data
 
 class prototype_dist_estimator():
-    def __init__(self, feature_num, cfg):
+    def __init__(self, feature_num, cfg, res = 1):
         super(prototype_dist_estimator, self).__init__()
 
         self.cfg = cfg
@@ -15,7 +15,11 @@ class prototype_dist_estimator():
         self.momentum = cfg.MODEL.CONTRAST.MOMENTUM
 
         # init prototype
-        self.init(feature_num=feature_num, resume="")
+        if res == 0:
+            resume = res
+        else:
+            resume = self.cfg.CV_DIR
+        self.init(feature_num=feature_num, resume=resume)
 
     def init(self, feature_num, resume=""):
         if resume:
