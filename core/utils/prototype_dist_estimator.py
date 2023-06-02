@@ -13,12 +13,11 @@ class prototype_dist_estimator():
         # momentum 
         self.use_momentum = cfg.MODEL.CONTRAST.USE_MOMENTUM
         self.momentum = cfg.MODEL.CONTRAST.MOMENTUM
-
+        resume = self.cfg.CV_DIR
         # init prototype
         if res == 0:
             resume = res
-        else:
-            resume = self.cfg.CV_DIR
+        
         self.init(feature_num=feature_num, resume=resume)
 
     def init(self, feature_num, resume=""):
