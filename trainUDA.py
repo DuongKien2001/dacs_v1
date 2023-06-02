@@ -414,7 +414,7 @@ def main():
     optimizer.zero_grad()
     model.cuda()
     model.train()
-    prototype_dist_init(cfg, trainloader, model)
+    #prototype_dist_init(cfg, trainloader, model)
     feat_estimator = prototype_dist_estimator(feature_num=feature_num, cfg=cfg)
     if cfg.SOLVER.MULTI_LEVEL:
         out_estimator = prototype_dist_estimator(feature_num=cfg.MODEL.NUM_CLASSES, cfg=cfg)
