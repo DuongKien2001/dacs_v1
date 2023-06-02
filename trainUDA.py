@@ -598,9 +598,9 @@ def main():
             src_mask = F.interpolate(labels.unsqueeze(0).float(), size=(Hs, Ws), mode='nearest').squeeze(0).long()
             src_mask = src_mask.contiguous().view(B * Hs * Ws, )
             assert not src_mask.requires_grad
+            pixelWiseWeight[pixelWiseWeight!=1] == 0.0
             pseudo_weight = F.interpolate(pixelWiseWeight.unsqueeze(1),
-                                            size=(65,65), mode='bilinear',
-                                            align_corners=True).squeeze(1)
+                                            size=(65,65), mode='nearest').squeeze(1)
             _, _, Ht, Wt = tgt_feat.size()
             tgt_mask = F.interpolate(targets_u.unsqueeze(1).float(), size=(65,65), mode='nearest').squeeze(1).long()
             tgt_mask_upt = copy.deepcopy(tgt_mask)
