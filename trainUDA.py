@@ -515,11 +515,14 @@ def main():
             images_remain = images_remain.cuda()
             inputs_u_w, _ = weakTransform(weak_parameters, data = images_remain)
             #inputs_u_w = inputs_u_w.clone()
-            logits_u_w = interp(ema_model(inputs_u_w)[0])
+            logits_u_w_65 = (ema_model(inputs_u_w)[0])
+            logits_u_w = interp(logits_u_w_65)
             logits_u_w, _ = weakTransform(getWeakInverseTransformParameters(weak_parameters), data = logits_u_w.detach())
-
+            logits_u_w_65, _ = weakTransform(getWeakInverseTransformParameters(weak_parameters), data = logits_u_w_65.detach()) 
             pseudo_label = torch.softmax(logits_u_w.detach(), dim=1)
             max_probs, targets_u_w = torch.max(pseudo_label, dim=1)
+            pseudo_label_65 = torch.softmax(logits_u_w_65.detach(), dim=1)
+            max_probs_65, targets_u_w_65 = torch.max(pseudo_label_65, dim=1)
 
             if mix_mask == "class":
                 for image_i in range(batch_size):
@@ -590,7 +593,7 @@ def main():
 
         else:
             loss = L_l
-        if i_iter >= 12000:
+        if i_iter >= 10000:
             # source mask: downsample the ground-truth label
             src_out_ema, src_feat_ema = ema_model(images)
             tgt_out_ema, tgt_feat_ema = ema_model(inputs_u_s)
@@ -604,12 +607,12 @@ def main():
             _, _, Ht, Wt = tgt_feat.size()
             tgt_mask = F.interpolate(targets_u.unsqueeze(1).float(), size=(65,65), mode='nearest').squeeze(1).long()
             tgt_mask_upt = copy.deepcopy(tgt_mask)
-            tgt_out_maxvalue, tgt_mask_st = torch.max(tgt_feat_ema, dim=1)
+            
             for i in range(cfg.MODEL.NUM_CLASSES):
-                tgt_mask_upt[(((tgt_out_maxvalue < cfg.SOLVER.DELTA) * (tgt_mask_st == i)).int() + (pseudo_weight != 1.0).int()) == 2] = 255
-            if i_iter < 12004:
+                tgt_mask_upt[(((max_probs_65 < cfg.SOLVER.DELTA) * (targets_u_w_65 == i)).int() + (pseudo_weight != 1.0).int()) == 2] = 255
+            if i_iter < 10020:
+                print((pseudo_weight != 1.0).sum())
                 print((tgt_mask_upt == 255).sum())
-            tgt_mask = tgt_mask.contiguous().view(B * Hs * Ws, )
             tgt_mask_upt = tgt_mask_upt.contiguous().view(B * Hs * Ws, )
             src_feat = src_feat.permute(0, 2, 3, 1).contiguous().view(B * Hs * Ws, A)
             tgt_feat = tgt_feat.permute(0, 2, 3, 1).contiguous().view(B * Ht * Wt, A)
@@ -691,13 +694,13 @@ def main():
         accumulated_loss_l.append(loss_l_value)
         if train_unlabeled:
             accumulated_loss_u.append(loss_u_value)
-        if i_iter >= 12000:
+        if i_iter >= 10000:
             accumulated_loss_feat.append(loss_feat_value)
             accumulated_loss_out.append(loss_out_value)
             
         if i_iter % log_per_iter == 0 and i_iter != 0:
                 #tensorboard_writer.add_scalar('Training/Supervised loss', np.mean(accumulated_loss_l), i_iter)
-            if i_iter >= 12000:
+            if i_iter >= 10000:
                 print('Training/contrastive_feat_loss', np.mean(accumulated_loss_feat), 'Training/contrastive_out_loss', np.mean(accumulated_loss_out), i_iter)
                 accumulated_loss_feat = []
                 accumulated_loss_out = []
