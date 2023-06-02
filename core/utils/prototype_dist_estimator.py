@@ -15,7 +15,7 @@ class prototype_dist_estimator():
         self.momentum = cfg.MODEL.CONTRAST.MOMENTUM
 
         # init prototype
-        self.init(feature_num=feature_num, resume=self.cfg.CV_DIR)
+        self.init(feature_num=feature_num, resume="")
 
     def init(self, feature_num, resume=""):
         if resume:
