@@ -593,7 +593,7 @@ def main():
 
         else:
             loss = L_l
-        if i_iter >= 10000:
+        if i_iter >= 9000:
             # source mask: downsample the ground-truth label
             src_out_ema, src_feat_ema = ema_model(images)
             tgt_out_ema, tgt_feat_ema = ema_model(inputs_u_s)
@@ -610,10 +610,11 @@ def main():
             
             for i in range(cfg.MODEL.NUM_CLASSES):
                 tgt_mask_upt[(((max_probs_65 < cfg.SOLVER.DELTA) * (targets_u_w_65 == i)).int() + (pseudo_weight != 1.0).int()) == 2] = 255
-            if i_iter < 10020:
+            if i_iter < 9020:
                 print((pseudo_weight != 1.0).sum())
+                print((tgt_mask_upt == 255).sum())
                 for i in range(cfg.MODEL.NUM_CLASSES):
-                    print((tgt_mask_upt == 255).sum())
+                    print(((max_probs_65 < cfg.SOLVER.DELTA) * (targets_u_w_65 == i)).sum())
             tgt_mask_upt = tgt_mask_upt.contiguous().view(B * Hs * Ws, )
             src_feat = src_feat.permute(0, 2, 3, 1).contiguous().view(B * Hs * Ws, A)
             tgt_feat = tgt_feat.permute(0, 2, 3, 1).contiguous().view(B * Ht * Wt, A)
@@ -695,13 +696,13 @@ def main():
         accumulated_loss_l.append(loss_l_value)
         if train_unlabeled:
             accumulated_loss_u.append(loss_u_value)
-        if i_iter >= 10000:
+        if i_iter >= 9000:
             accumulated_loss_feat.append(loss_feat_value)
             accumulated_loss_out.append(loss_out_value)
             
         if i_iter % log_per_iter == 0 and i_iter != 0:
                 #tensorboard_writer.add_scalar('Training/Supervised loss', np.mean(accumulated_loss_l), i_iter)
-            if i_iter >= 10000:
+            if i_iter >= 9000:
                 print('Training/contrastive_feat_loss', np.mean(accumulated_loss_feat), 'Training/contrastive_out_loss', np.mean(accumulated_loss_out), i_iter)
                 accumulated_loss_feat = []
                 accumulated_loss_out = []
