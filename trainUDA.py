@@ -610,7 +610,7 @@ def main():
             
             for i in range(cfg.MODEL.NUM_CLASSES):
                 tgt_mask_upt[(((max_probs_65 < cfg.SOLVER.DELTA) * (targets_u_w_65 == i)).int() + (pseudo_weight != 1.0).int()) == 2] = 255
-            if i_iter < 8960:
+            if i_iter > 89600:
                 print("pw: ",(pseudo_weight != 1.0).sum())
                 print("mask_255:", (tgt_mask_upt == 255).sum())
                 for i in range(cfg.MODEL.NUM_CLASSES):
