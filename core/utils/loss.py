@@ -8,7 +8,7 @@ class PrototypeContrastiveLoss(nn.Module):
         super(PrototypeContrastiveLoss, self).__init__()
         self.cfg = cfg
 
-    def forward(self, Proto, feat, labels, pixelWiseWeight=None):
+    def forward(self, Proto, feat, labels, pixelWiseWeight=None, aa = False):
         """
         Args:
             C: NUM_CLASSES A: feat_dim B: batch_size H: feat_high W: feat_width N: number of pixels except IGNORE_LABEL
@@ -27,7 +27,8 @@ class PrototypeContrastiveLoss(nn.Module):
         Proto = F.normalize(Proto, p=2, dim=1)
         logits = feat.mm(Proto.permute(1, 0).contiguous())
         logits = logits / self.cfg.MODEL.CONTRAST.TAU
-        
+        if aa:
+            print(logits[10], loggits[100], logits[200])
         if pixelWiseWeight is None:
             ce_criterion = nn.CrossEntropyLoss(ignore_index = 255)
             loss = ce_criterion(logits, labels)

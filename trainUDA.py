@@ -636,7 +636,10 @@ def main():
                                         labels=tgt_mask_upt)
             
             #meters.update(loss_feat=loss_feat.item())
-
+            if i_iter == 8940 or i_iter == 8941:
+                    pcl_criterion_tgt(Proto=feat_estimator.Proto.detach(),
+                                        feat=tgt_feat,
+                                        labels=tgt_mask_upt, aa = True)
             if cfg.SOLVER.MULTI_LEVEL:
                 src_out = src_pred.permute(0, 2, 3, 1).contiguous().view(B * Hs * Ws, cfg.MODEL.NUM_CLASSES)
                 tgt_out = logits_u_s_tgt.permute(0, 2, 3, 1).contiguous().view(B * Ht * Wt, cfg.MODEL.NUM_CLASSES)
@@ -654,6 +657,7 @@ def main():
                                         feat=tgt_out,
                                         labels=tgt_mask_upt)
                 #meters.update(loss_out=loss_out.item())
+
 
                 loss = loss + cfg.SOLVER.LAMBDA_FEAT * loss_feat + cfg.SOLVER.LAMBDA_OUT * loss_out
             else:
