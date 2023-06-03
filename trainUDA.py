@@ -614,7 +614,9 @@ def main():
                 print("pw: ",(pseudo_weight != 1.0).sum())
                 print("mask_255:", (tgt_mask_upt == 255).sum())
                 for i in range(cfg.MODEL.NUM_CLASSES):
-                    print(i, ((max_probs_65 >= cfg.SOLVER.DELTA) * (targets_u_w_65 == i)).sum())
+                    print(i, ((max_probs_65 >= cfg.SOLVER.DELTA) * (targets_u_w_65 == i)).sum(), (max_probs_65 <= cfg.SOLVER.DELTA) * (targets_u_w_65 == i)).sum())
+            if i_iter == 8960:
+                print(max_probs_65[1,30,30], max_probs_65[0,30,30])
             tgt_mask_upt = tgt_mask_upt.contiguous().view(B * Hs * Ws, )
             src_feat = src_feat.permute(0, 2, 3, 1).contiguous().view(B * Hs * Ws, A)
             tgt_feat = tgt_feat.permute(0, 2, 3, 1).contiguous().view(B * Ht * Wt, A)
