@@ -718,7 +718,7 @@ def main():
             _, pred_u_s = torch.max(logits_u_w, dim=1)
             #save_image(pred_u_s[0].cpu(),i_iter,'pred1',palette.CityScpates_palette)
             #save_image(pred_u_s[1].cpu(),i_iter,'pred2',palette.CityScpates_palette)
-        if i_iter == 269146:
+        if i_iter == 297399:
             print(list_name)
             break
 
